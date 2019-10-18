@@ -3,7 +3,7 @@ Concatenate files to remote and print remote input on standard output
 
 
 
-rcat [destination] port [FILE]...
+<pre>rcat [destination] port [FILE]...</pre>
 
 Examples:
 
