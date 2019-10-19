@@ -3,7 +3,7 @@ Concatenate files to remote and print remote input on standard output
 
 
 
-<pre>rcat [destination] port [FILE]...</pre>
+<pre>rcat [-k seconds] [-d millis] [destination] port [FILE]...</pre>
 
 Examples:
 
@@ -16,4 +16,16 @@ Examples:
 
 
 // send input file to remote and save remote input to output file
-<pre>$ rcat localhost 1234 request.txt > response.txt</pre>
+// keep the connection open for 30 seconds after input EOF
+<pre>$ rcat -k30 localhost 1234 request.txt > response.txt</pre>
+
+
+// send input file to remote and save remote input to output file
+// delay 200 milliseconds between output lines
+<pre>$ rcat -d200 localhost 1234 request.txt > response.txt</pre>
+
+// continuous tail input file to remote
+<pre>$ tail -f app.log | rcat -k1 localhost 1234</pre>
+
+
+
