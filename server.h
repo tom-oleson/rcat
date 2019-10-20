@@ -30,12 +30,13 @@
 #ifndef __SERVER_H
 #define __SERVER_H
 
+#include <vector>
 #include "log.h"
 #include "network.h"
 
 namespace rcat {
 
-void run(int port, const std::string &host_name, int host_port);
+void run(int keep, int interval, const std::string &host, int port, const std::vector<std::string> &files);
 
 }
 

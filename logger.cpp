@@ -29,34 +29,11 @@
 
 #include "logger.h"
 
-cm_log::multiplex_logger mx_log;
+void rcat::init_logs() {
 
-cm_log::rolling_file_logger
-    app_log("./log/", "rcat", ".log", ((24 * 60) * 60) /*seconds*/, 6 /* retain # */);
-
-void rcat::init_logs(cm_log::level::en lvl, int interval, int keep) {
-
-    cm_log::console.set_log_level(lvl);
-    cm_log::console.set_date_time_format("%m/%d/%Y %H:%M:%S");
-    cm_log::console.set_message_format("${date_time} [${lvl}]: ${msg}");
-
-    app_log.set_log_level(lvl);
-    app_log.set_date_time_format("%m/%d/%Y %H:%M:%S");
-    app_log.set_message_format("${date_time}${millis} [${lvl}] <${thread}>: ${msg}"); 
-
-    mx_log.set_log_level(lvl);
-    mx_log.add(cm_log::console);
-    mx_log.add(app_log);
-
-    set_default_logger(&mx_log);
-
-    
-    if(60 <= interval && interval <= ((24*60)*60)) {
-        app_log.set_interval(interval);
-    }
-
-    if(0 <= keep && keep <= 364) {
-        app_log.set_keep(keep);    
-    }
+    cm_log::console.set_log_level(cm_log::level::error);
+    //cm_log::console.set_date_time_format("%m/%d/%Y %H:%M:%S");
+    //cm_log::console.set_message_format("${date_time} [${lvl}]: ${msg}");
+    cm_log::console.set_message_format("${msg}");
 
 }

@@ -27,155 +27,92 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <vector>
 #include "server.h"
 
-class watcher_store: protected cm::mutex {
 
-protected:
-    
-    std::vector<int> _list;
 
-public:
+void _delay(int interval) {
 
-    bool add(int fd) {
-        lock();
-        _list.push_back(fd);
-        unlock();
-        return true;
+    // allow other threads to do some work
+    long n = 1000000;
+    time_t s = 0;
+    if(interval > 0) { 
+        n = ((long) interval % 1000L) * 1000000L;
+        s = (time_t) interval / 1000;
     }
-    
-    bool remove(int fd) {
-        bool removed = false;
-        lock();
-        for(auto it = _list.begin(); it != _list.end(); it++) {
-            if((*it) == fd) {
-                _list.erase(it);
-                removed = true;
+    timespec delay = {s, n};
+    nanosleep(&delay, NULL);    // interruptable
+}
+
+
+void cat_stdin(int socket, int interval) {
+    char buf[1024] = {'\0'};
+    size_t sz = 0;
+    while(!std::cin.eof()) {
+        std::cin.getline(buf, sizeof(buf));
+        if((sz = std::cin.gcount()) > 0) {
+            buf[sz-1] = '\n';
+            if(-1 == cm_net::write(socket, buf, sz))
                 break;
+            _delay(interval);
+        }
+    }
+}
+
+void cat_file(int socket, int interval, std::string &file_name) {
+
+    std::fstream fs;
+    char buf[1024] = {'\0'};
+    size_t sz = 0;
+
+    fs.open(file_name.c_str(), std::fstream::in);
+    if(fs.is_open()) {
+        
+        while(!fs.eof()) {
+            fs.getline(buf, sizeof(buf));
+            if((sz = fs.gcount()) > 0) {
+                buf[sz-1] = '\n';
+                if(-1 == cm_net::write(socket, buf, sz))
+                    break;
+                _delay(interval);
             }
         }
-        unlock();
-        return removed;   
+        fs.close();
     }
+}
 
-    void notify_all(cm_net::input_event *event) {
-        lock();
-        for(auto fd: _list) {
-            if(fd != event->fd) {
-                cm_net::send(fd,  event->msg);
-            }
-        }
-        unlock();
-    }
 
-    size_t size() {
-        lock();
-        size_t size = _list.size();
-        unlock();
-        return size;
-    }
+void client_receive(int socket, const char *buf, size_t sz) {
+    puts(std::string(buf, sz).c_str());
+}
 
-    void clear() {
-        lock();
-        _list.clear();
-        unlock();
-    }
-};
+void rcat::run(int keep, int interval, const std::string &host_name, int host_port, const std::vector<std::string> &files) {
 
-watcher_store watchers;
-
-void request_handler(void *arg) {
-
-    cm_net::input_event *event = (cm_net::input_event *) arg;
-
-    // if this in a new connection (add to watchers list)
-    if(event->connect) {
-        watchers.add(event->fd);
-        cm_log::info(cm_util::format("%d: socket added to watchers list: %s", event->fd, event->msg.c_str()));
-        return;        
-    }
-
-    // if this in an EOF event (client disconnected)
-    if(event->eof) {
-        if( watchers.remove(event->fd) ) {
-            cm_log::info(cm_util::format("%d: socket removed from watchers list", event->fd));
-        }
+    if(cm_net::gethostbyname(host_name, NULL) == CM_NET_ERR) {
         return;
     }
 
-    cm_log::info(cm_util::format("%d: received message:", event->fd));
-    cm_log::hex_dump(cm_log::level::info, event->msg.c_str(), event->msg.size(), 16);
-    
-    watchers.notify_all(event);
-}
-
-void request_dealloc(void *arg) {
-    delete (cm_net::input_event *) arg;
-}
-
-void client_receive(int socket, const char *buf, size_t sz) {
-
-    cm_log::info(cm_util::format("%d: received response:", socket));
-    cm_log::hex_dump(cm_log::level::info, buf, sz, 16);
-
-    cm_net::input_event event(socket, std::string(buf, sz));
-    watchers.notify_all(&event);
-}
-
-void rcat::run(int port, const std::string &host_name, int host_port) {
-
-    // create thread pool that will do work for the server
-    cm_thread::pool thread_pool(6);
-
-    // startup tcp server
-    cm_net::pool_server server(port, &thread_pool, request_handler,
-        request_dealloc);
-
     cm_net::client_thread *client = nullptr;
-    bool connected = false;
-    if(host_port != -1) {
-        cm_log::info(cm_util::format("client host: %s:%d", host_name.c_str(), host_port));
+    client = new cm_net::client_thread(host_name, host_port, client_receive); 
+    if(nullptr != client && client->is_connected()) {
+
+        if(files.size() == 0) {
+            cat_stdin(client->get_socket(), interval);
+        }
+        else {
+            for(auto file_name : files) {
+                cat_file(client->get_socket(), interval, file_name);
+            }
+        }
     }
-
-    time_t next_connect_time = 0;
-
-    while(1) {
-        timespec delay = {0, 1000000000};   // 1000 ms
+    
+    long n = 1000000000;
+    if(keep > 0)  {
+        n *= keep;
+        timespec delay = {0, n};
         nanosleep(&delay, NULL);
-
-        if(host_port != -1) {
-            if(nullptr == client) {
-                client = new cm_net::client_thread(host_name, host_port, client_receive); 
-                next_connect_time = cm_time::clock_seconds() + 60;
-            }
-
-            // if client thread is running, we are connected
-            if(nullptr != client && client->is_connected()) {
-                if(!connected) {
-                    watchers.add(client->get_socket());
-                    connected = true;
-                }
-            }    
-
-            // if client thread is NOT running, we are NOT connected
-            if(nullptr != client && !client->is_connected()) {
-                if(connected) {
-                    connected = false;
-                    watchers.remove(client->get_socket());
-                }
-
-                if(cm_time::clock_seconds() > next_connect_time) {
-                    // attempt reconnect
-                    client->start();
-                    next_connect_time = cm_time::clock_seconds() + 60;
-                }
-            }
-        }        
     }
-
-    // wait for pool_server threads to complete all work tasks
-    thread_pool.wait_all();
+    
 
     if(nullptr != client) delete client;
 }

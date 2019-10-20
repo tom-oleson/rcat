@@ -43,34 +43,31 @@ R"(  \____ \   x  / /)""\n"
 R"(       \ \____/ /)""\n"
 R"(        \______/)""\n";
 
+void usage(int argc, char *argv[]) {
+    printf("usage: rcat [-k seconds] [-d millis] [-v] [destination] port [FILE]...\n");
+}
+
+bool is_port_number(const std::string& s) {
+    return( strspn( s.c_str(), "0123456789" ) == s.size() );
+}
+
 int main(int argc, char *argv[]) {
 
     int opt;
-    int port = 54000;
-    int log_lvl = (cm_log::level::en) cm_log::level::info;
     bool version = false;
-    int interval = 0;
+    int interval = 1;
     int keep = 0;
-    std::string host_name;
-    int host_port = -1;
-    std::vector<std::string> v;
+    std::string host = "localhost";
+    int port = -1;
 
-    while((opt = getopt(argc, argv, "hc:l:p:i:k:v")) != -1) {
+    while((opt = getopt(argc, argv, "hk:d:v")) != -1) {
         switch(opt) {
-            case 'p':
-                port = atoi(optarg);
-                break;
 
             case 'v':
                 version = true;
-                puts(__banner__);
                 break;
 
-            case 'l':
-                log_lvl = atoi(optarg);
-                break;
-
-            case 'i':
+            case 'd':
                 interval = atoi(optarg);
                 break;
 
@@ -78,25 +75,46 @@ int main(int argc, char *argv[]) {
                 keep = atoi(optarg);
                 break;
 
-            case 'c':
-                v = cm_util::split(optarg, ':');
-                if(v.size() == 2) {
-                    host_name = v[0];
-                    host_port = atoi(v[1].c_str());
-                }
-                break;
-
             case 'h':
             default:
-                printf("usage: %s [-p<port>] [-l<level>] [-i<interval>] [-k<keep>] [-c<host:port>] [-v]\n", argv[0]);
+                usage(argc, argv);
                 exit(0);
         }
     }
 
-    rcat::init_logs((cm_log::level::en) log_lvl, interval, keep);
-    cm_log::always(cm_util::format("RCAT %s build: %s %s", VERSION ,__DATE__,__TIME__));
+    rcat::init_logs();
+
+    if(version) {
+        puts(__banner__);
+        cm_log::always(cm_util::format("RCAT %s build: %s %s", VERSION ,__DATE__,__TIME__));
+        usage(argc, argv);
+        exit(0);
+    }
+
+    if(optind >= argc) {
+        fputs("Expected argument after options\n", stderr);
+        exit(1);
+    }
+
+    if(optind < argc && !is_port_number(argv[optind])) {
+        host = argv[optind++];
+    }
+
+    if(optind < argc && is_port_number(argv[optind])) {
+        port = atoi(argv[optind++]);
+    }
     
-    rcat::run(port, host_name, host_port);
+    if(port == -1) {
+        fputs("Missing argument port\n", stderr);
+        exit(1);
+    }
+
+    std::vector<std::string> files;
+    while(optind < argc) {
+        files.push_back(argv[optind++]);
+    }
+
+    rcat::run(keep, interval, host, port, files);
 
     return 0;
 }

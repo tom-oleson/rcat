@@ -34,7 +34,7 @@
 
 namespace rcat {
 
-void init_logs(cm_log::level::en lvl, int interval, int keep);
+void init_logs();
 
 }
 
