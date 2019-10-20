@@ -35,3 +35,5 @@ rcat
 core
 */log
 *.log
+request.txt
+response.txt
