@@ -83,7 +83,7 @@ void cat_file(int socket, int interval, std::string &file_name) {
 
 
 void client_receive(int socket, const char *buf, size_t sz) {
-    puts(std::string(buf, sz).c_str());
+    printf("%s", std::string(buf, sz).c_str());
 }
 
 void rcat::run(int keep, int interval, const std::string &host_name, int host_port, const std::vector<std::string> &files) {

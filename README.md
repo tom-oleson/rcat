@@ -12,8 +12,8 @@ Examples:
 
 
 // pipe message with single quotes and print remote input on standard output
-<pre>$ echo $"name=\'Tom Oleson\'" | rcat localhost 1234 </pre>
-
+<pre>$ echo $"+name 'Tom Oleson'" | rcat localhost 1234 </pre>
+<pre>$ echo $"\$name" | rcat localhost 1234 </pre>
 
 // send input file to remote and save remote input to output file
 // keep the connection open for 30 seconds after input EOF
