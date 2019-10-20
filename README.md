@@ -16,8 +16,17 @@
 # rcat
 Concatenate files to remote and print remote input on standard output
 
+<pre>
+usage: rcat [-d millis] [-k seconds] [-R size] [-S size] [-v] [destination] port [FILE]...
 
-<pre>usage: rcat [-k seconds] [-d millis] [-v] [destination] port [FILE]...</pre>
+-d millis     Delay between output lines (milliseconds)
+-k seconds    Keep connection open after output has finished
+              to allow large response to be fully received (seconds)
+-R size       Set socket receive buffer size
+-S size       Set socket send buffer size
+-v            Output version/build info to console
+</pre>
+
 
 Examples:
 

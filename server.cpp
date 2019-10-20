@@ -82,7 +82,7 @@ void client_receive(int socket, const char *buf, size_t sz) {
     printf("%s", std::string(buf, sz).c_str());
 }
 
-void rcat::run(int keep, int interval, const std::string &host_name, int host_port, const std::vector<std::string> &files) {
+void rcat::run(int keep, int interval, int in_buf_sz, int out_buf_sz, const std::string &host_name, int host_port, const std::vector<std::string> &files) {
 
     if(cm_net::gethostbyname(host_name, NULL) == CM_NET_ERR) {
         return;
@@ -92,12 +92,22 @@ void rcat::run(int keep, int interval, const std::string &host_name, int host_po
     client = new cm_net::client_thread(host_name, host_port, client_receive); 
     if(nullptr != client && client->is_connected()) {
 
+        int socket = client->get_socket();
+
+        if(in_buf_sz > 0) {
+            cm_net::set_receive_buffer(socket, in_buf_sz);
+        }
+
+        if(out_buf_sz > 0) {
+            cm_net::set_send_buffer(socket, out_buf_sz);
+        }
+
         if(files.size() == 0) {
-            cat_stdin(client->get_socket(), interval);
+            cat_stdin(socket, interval);
         }
         else {
             for(auto file_name : files) {
-                cat_file(client->get_socket(), interval, file_name);
+                cat_file(socket, interval, file_name);
             }
         }
     }

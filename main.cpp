@@ -44,7 +44,15 @@ R"(       \ \____/ /)""\n"
 R"(        \______/)""\n";
 
 void usage(int argc, char *argv[]) {
-    printf("usage: rcat [-k seconds] [-d millis] [-v] [destination] port [FILE]...\n");
+    puts("usage: rcat [-d millis] [-k seconds] [-R size] [-S size] [-v] [destination] port [FILE]...");
+    puts("");
+    puts("-d millis     Delay between output lines (milliseconds)");
+    puts("-k seconds    Keep connection open after output has finished");
+    puts("              to allow large response to be fully received (seconds)");
+    puts("-R size       Set socket receive buffer size");
+    puts("-S size       Set socket send buffer size");
+    puts("-v            Output version/build info to console");
+    puts("");
 }
 
 bool is_port_number(const std::string& s) {
@@ -57,10 +65,12 @@ int main(int argc, char *argv[]) {
     bool version = false;
     int interval = 1;
     int keep = 0;
+    int input_buf_sz = 0;
+    int output_buf_sz = 0;
     std::string host = "localhost";
     int port = -1;
 
-    while((opt = getopt(argc, argv, "hk:d:v")) != -1) {
+    while((opt = getopt(argc, argv, "hk:d:R:S:v")) != -1) {
         switch(opt) {
 
             case 'v':
@@ -73,6 +83,14 @@ int main(int argc, char *argv[]) {
 
             case 'k':
                 keep = atoi(optarg);
+                break;
+
+            case 'R':
+                input_buf_sz = atoi(optarg);
+                break;
+
+            case 'S':
+                output_buf_sz = atoi(optarg);
                 break;
 
             case 'h':
@@ -114,7 +132,7 @@ int main(int argc, char *argv[]) {
         files.push_back(argv[optind++]);
     }
 
-    rcat::run(keep, interval, host, port, files);
+    rcat::run(keep, interval, input_buf_sz, input_buf_sz, host, port, files);
 
     return 0;
 }

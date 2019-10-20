@@ -36,7 +36,7 @@
 
 namespace rcat {
 
-void run(int keep, int interval, const std::string &host, int port, const std::vector<std::string> &files);
+void run(int keep, int interval, int in_buf_sz, int out_buf_sz, const std::string &host, int port, const std::vector<std::string> &files);
 
 }
 
