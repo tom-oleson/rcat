@@ -29,8 +29,6 @@
 
 #include "server.h"
 
-
-
 void _delay(int interval) {
 
     // allow other threads to do some work
@@ -43,7 +41,6 @@ void _delay(int interval) {
     timespec delay = {s, n};
     nanosleep(&delay, NULL);    // interruptable
 }
-
 
 void cat_stdin(int socket, int interval) {
     char buf[1024] = {'\0'};
@@ -81,7 +78,6 @@ void cat_file(int socket, int interval, std::string &file_name) {
     }
 }
 
-
 void client_receive(int socket, const char *buf, size_t sz) {
     printf("%s", std::string(buf, sz).c_str());
 }
@@ -106,8 +102,11 @@ void rcat::run(int keep, int interval, const std::string &host_name, int host_po
         }
     }
     
-    _delay(1000 * keep);
+    int count = keep;
+    while(count > 0 && client->is_connected()) {
+        _delay(1000);
+        count--;
+    }
     
-
     if(nullptr != client) delete client;
 }
