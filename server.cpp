@@ -102,6 +102,11 @@ void rcat::run(int keep, int interval, int in_buf_sz, int out_buf_sz, const std:
             cm_net::set_send_buffer(socket, out_buf_sz);
         }
 
+        // initial delaay before we start sending data...
+        if(interval > 0) {
+            _delay(interval);
+        }
+
         if(files.size() == 0) {
             cat_stdin(socket, interval);
         }
