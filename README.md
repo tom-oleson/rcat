@@ -1,9 +1,23 @@
+<pre>
+         ______
+        / ____ \
+   ____/ /    \ \
+  / ____/   x  \ \
+ / /     __/   / / RCAT
+/ /  x__/  \  / /  Remote File Concatenator
+\ \     \__/  \ \  Copyright (C) 2019, Tom Oleson, All Rights Reserved.
+ \ \____   \   \ \ Made in the U.S.A.
+  \____ \   x  / /
+       \ \____/ /
+        \______/
+</pre>
+
+
 # rcat
 Concatenate files to remote and print remote input on standard output
 
 
-
-<pre>rcat [-k seconds] [-d millis] [destination] port [FILE]...</pre>
+<pre>usage: rcat [-k seconds] [-d millis] [-v] [destination] port [FILE]...</pre>
 
 Examples:
 

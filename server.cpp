@@ -106,12 +106,7 @@ void rcat::run(int keep, int interval, const std::string &host_name, int host_po
         }
     }
     
-    long n = 1000000000;
-    if(keep > 0)  {
-        n *= keep;
-        timespec delay = {0, n};
-        nanosleep(&delay, NULL);
-    }
+    _delay(1000 * keep);
     
 
     if(nullptr != client) delete client;
