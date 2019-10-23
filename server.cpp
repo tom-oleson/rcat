@@ -84,10 +84,6 @@ void client_receive(int socket, const char *buf, size_t sz) {
 
 void rcat::run(int keep, int interval, int in_buf_sz, int out_buf_sz, const std::string &host_name, int host_port, const std::vector<std::string> &files) {
 
-    if(cm_net::gethostbyname(host_name, NULL) == CM_NET_ERR) {
-        return;
-    }
-
     cm_net::client_thread *client = nullptr;
     client = new cm_net::client_thread(host_name, host_port, client_receive); 
     if(nullptr != client && client->is_connected()) {
