@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
     std::string host = "localhost";
     int port = -1;
 
-    while((opt = getopt(argc, argv, "hk:d:R:S:v")) != -1) {
+    while((opt = getopt(argc, argv, "hck:d:R:S:v")) != -1) {
         switch(opt) {
 
             case 'v':

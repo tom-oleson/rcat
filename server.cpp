@@ -79,10 +79,14 @@ void cat_file(int socket, int interval, std::string &file_name) {
 }
 
 void client_receive(int socket, const char *buf, size_t sz) {
-    printf("%s", std::string(buf, sz).c_str());
+    std::cout << cm_util::format("%s", std::string(buf, sz).c_str());
+    std::cout.flush();
 }
 
 void rcat::run(int keep, int interval, int in_buf_sz, int out_buf_sz, const std::string &host_name, int host_port, const std::vector<std::string> &files) {
+
+    std::ios_base::sync_with_stdio(false); 
+    std::cin.tie(NULL);    
 
     cm_net::client_thread *client = nullptr;
     client = new cm_net::client_thread(host_name, host_port, client_receive); 
