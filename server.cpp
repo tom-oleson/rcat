@@ -119,9 +119,9 @@ void rcat::run(int keep, int interval, int in_buf_sz, int out_buf_sz, const std:
     }
     
     int count = keep;
-    while(count > 0 && client->is_connected()) {
+    while((keep == 0 || count > 0) && client->is_connected()) {
         _delay(1000);
-        count--;
+        if(keep > 0) count--;
     }
     
     if(nullptr != client) delete client;
