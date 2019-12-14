@@ -47,7 +47,7 @@ void usage(int argc, char *argv[]) {
     puts("usage: rcat [-d millis] [-k seconds] [-R size] [-S size] [-v] [destination] port [FILE]...");
     puts("");
     puts("-d millis     Delay between output lines (milliseconds)");
-    puts("-k seconds    Keep connection open after output has finished");
+    puts("-k seconds    Keep connection open after output has finished (0=forever)");
     puts("              to allow large response to be fully received (seconds)");
     puts("-R size       Set socket receive buffer size");
     puts("-S size       Set socket send buffer size");
