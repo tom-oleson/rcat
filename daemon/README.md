@@ -28,14 +28,12 @@ NOTE: The make file assumes that rcat is up one directory and has already
 been built using its own make file.
 
 
-To start, stop, restart service, run in /opt/vortex
-
 <pre>
+chmod +x /etc/init.d/vortex_stats -v
+service vortex_stats start
+
+or 
 sudo /etc/init.d/vortex_stats start
-
-or
-
-sudo service vortex_stats start
 </pre>
 
 NOTE:
