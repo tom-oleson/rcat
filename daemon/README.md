@@ -29,7 +29,7 @@ been built using its own make file.
 
 
 <pre>
-chmod +x /etc/init.d/vortex_stats -v
+
 service vortex_stats start
 
 or 
