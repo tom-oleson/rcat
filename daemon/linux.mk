@@ -38,11 +38,12 @@ all: install
 
 install:
 	@mkdir -p $(PROD_DIR)
-	@cp -f *.sh $(PROD_DIR)
+	@cp -f stats.sh $(PROD_DIR)
 	@cp -f vortex_stats /etc/init.d
 	@cp -f ../rcat $(PROD_DIR)
 	@chmod +x $(PROD_DIR)/*.sh
 	@chmod +x /etc/init.d/vortex_stats -v
+	@sudo update-rc.d vortex_stats defaults
 	@echo "$(PROD_DIR) $(@)ed" 
 	@echo "$(PROD) $(@)ed" 
 	
