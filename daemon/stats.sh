@@ -1,15 +1,16 @@
 #!/bin/sh
 
-VORTEX=$1
-PORT=$2
+VORTEX="tom-thinkpad-t4"
+PORT=54000
 
 # use POSOX locale for correct number conversions in awk
 LC_NUMERIC=POSIX
 
-
 # use shared memory tmpfs (super fast)
 OUTFILE="/dev/shm/stats.out"
 RESFILE="/dev/shm/response.out"
+
+while : ; do
 
 # clear any prevous stats output file
 rm -f ${OUTFILE}
@@ -22,4 +23,7 @@ echo +$(hostname)_temp "{\"time\":"$(date +%s)","$(sensors | awk '/^temp1:/ { pr
 echo +$(hostname)_sda1 "{\"time\":"$(date +%s)","$(df -H | awk '/sda1/ {print "\"sda1_used\":" $3+0 "," "\"sda1_avail\":" $4+0}')"}" >> ${OUTFILE}
 
 #output stats to vortex
-rcat -d50 ${VORTEX} ${PORT} ${OUTFILE} > ${RESFILE}
+/opt/vortex/rcat -d50 ${VORTEX} ${PORT} ${OUTFILE} > ${RESFILE}
+
+sleep 60
+done

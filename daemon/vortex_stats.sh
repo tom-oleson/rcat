@@ -9,7 +9,7 @@ LOGFILE="/var/log/${NAME}.log"
 DAEMON="/bin/sh"
 
 # Path the script
-DAEMON_OPTS="/var/opt/vortex/stats.sh"
+DAEMON_OPTS="/opt/vortex/stats.sh"
 
 START_OPTS="--start --background --make-pidfile --pidfile ${PIDFILE} --exec ${DAEMON} ${DAEMON_OPTS}"
 STOP_OPTS="--stop --pidfile ${PIDFILE}"
