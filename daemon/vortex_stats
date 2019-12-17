@@ -9,9 +9,11 @@ LOGFILE="/var/log/${NAME}.log"
 DAEMON="/bin/sh"
 
 # Path the script
-DAEMON_OPTS="/opt/vortex/stats.sh"
+DAEMON_OPTS="/bin/sh /opt/vortex/stats.sh"
 
-START_OPTS="--start --background --make-pidfile --pidfile ${PIDFILE} --exec ${DAEMON} ${DAEMON_OPTS}"
+#START_OPTS="--start --background --make-pidfile --pidfile ${PIDFILE} --exec ${DAEMON} ${DAEMON_OPTS}"
+#START_OPTS="--start --make-pidfile --pidfile ${PIDFILE} --exec ${DAEMON} ${DAEMON_OPTS}"
+START_OPTS="--start --make-pidfile --pidfile ${PIDFILE} --exec ${DAEMON_OPTS}"
 STOP_OPTS="--stop --pidfile ${PIDFILE}"
 
 # does exec exit?
