@@ -10,20 +10,20 @@ LC_NUMERIC=POSIX
 OUTFILE="/dev/shm/stats.out"
 RESFILE="/dev/shm/response.out"
 
-while : ; do
+while true; do
+    # clear any prevous stats output file
+    rm -f ${OUTFILE}
 
-# clear any prevous stats output file
-rm -f ${OUTFILE}
+    # write each line to our stats output file
+    # each output adds +0 to fields to convert them to numbers sans decorators
+    echo +$(hostname)_mem "{\"time\":"$(date +%s)","$(free | awk '/^Mem/{print "\"mem_used\":" $3+0 "," "\"mem_total\":" $2+0}')"}" >> ${OUTFILE}
+    echo +$(hostname)_swap "{\"time\":"$(date +%s)","$(free | awk '/^Swap/{print "\"swap_used\":" $3+0 "," "\"swap_total\":" $2+0}')"}" >> ${OUTFILE}
+    echo +$(hostname)_temp "{\"time\":"$(date +%s)","$(sensors | awk '/^temp1:/ { print "\"cpu_temp\":" $2+0.0}')"}" >> ${OUTFILE}
+    echo +$(hostname)_sda1 "{\"time\":"$(date +%s)","$(df -H | awk '/sda1/ {print "\"sda1_used\":" $3+0 "," "\"sda1_avail\":" $4+0}')"}" >> ${OUTFILE}
 
-# write each line to our stats output file
-# each output adds +0 to fields to convert them to numbers sans decorators
-echo +$(hostname)_mem "{\"time\":"$(date +%s)","$(free | awk '/^Mem/{print "\"mem_used\":" $3+0 "," "\"mem_total\":" $2+0}')"}" >> ${OUTFILE}
-echo +$(hostname)_swap "{\"time\":"$(date +%s)","$(free | awk '/^Swap/{print "\"swap_used\":" $3+0 "," "\"swap_total\":" $2+0}')"}" >> ${OUTFILE}
-echo +$(hostname)_temp "{\"time\":"$(date +%s)","$(sensors | awk '/^temp1:/ { print "\"cpu_temp\":" $2+0.0}')"}" >> ${OUTFILE}
-echo +$(hostname)_sda1 "{\"time\":"$(date +%s)","$(df -H | awk '/sda1/ {print "\"sda1_used\":" $3+0 "," "\"sda1_avail\":" $4+0}')"}" >> ${OUTFILE}
+    #output stats to vortex
+    /opt/vortex/rcat -k1 -d50 ${VORTEX} ${PORT} ${OUTFILE} > ${RESFILE}
 
-#output stats to vortex
-/opt/vortex/rcat -d50 ${VORTEX} ${PORT} ${OUTFILE} > ${RESFILE}
+    sleep 60s
 
-sleep 60
-done
+(true); done
