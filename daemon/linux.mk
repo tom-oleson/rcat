@@ -28,6 +28,7 @@
 #
 
 TOP=$(PWD)
+PROD=vortex_stats
 PROD_DIR=/opt/vortex
 
 
@@ -40,5 +41,7 @@ install:
 	@cp -f *.sh $(PROD_DIR)
 	@cp -f ../rcat $(PROD_DIR)
 	@chmod +x $(PROD_DIR)/*.sh
+	@chmod +x /etc/init.d/vortex_stats -v
 	@echo "$(PROD_DIR) $(@)ed" 
+	@echo "$(PROD) $(@)ed" 
 	

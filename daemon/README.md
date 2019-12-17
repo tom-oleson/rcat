@@ -22,7 +22,7 @@ To install, execute:
 sudo make -f linux.mk
 </pre>
 
-This will install vortex_stats.sh, stats.sh and a copy of rcat into /opt/vortex
+This will install vortex_stats to /etc/init.d, stats.sh and a copy of rcat into /opt/vortex
 
 NOTE: The make file assumes that rcat is up one directory and has already
 been built using its own make file.
@@ -31,9 +31,8 @@ been built using its own make file.
 To start, stop, restart service, run in /opt/vortex
 
 <pre>
-sudo /opt/vortex/vortex_stats.sh start
-sudo /opt/vortex/vortex_stats.sh stop
-sudo /opt/vortex/vortex_stats.sh restart
+chmod +x /etc/init.d/vortex_stats -v
+service vortex_stats start
 </pre>
 
 NOTE:
