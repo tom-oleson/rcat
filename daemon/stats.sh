@@ -11,7 +11,7 @@ OUTFILE="/dev/shm/stats.out"
 RESFILE="/dev/shm/response.out"
 
 while true; do
-    # clear any prevous stats output file
+    # clear any previous stats output file
     rm -f ${OUTFILE}
 
     # write each line to our stats output file
