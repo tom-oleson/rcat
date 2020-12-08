@@ -54,6 +54,7 @@ void cat_stdin(int socket, int interval) {
             _delay(interval);
         }
     }
+    cm_net::shutdown(socket, SHUT_WR);  //FIN/ACK
 }
 
 void cat_file(int socket, int interval, std::string &file_name) {
@@ -75,6 +76,7 @@ void cat_file(int socket, int interval, std::string &file_name) {
             }
         }
         fs.close();
+        cm_net::shutdown(socket, SHUT_WR);  //FIN/ACK
     }
 }
 
